@@ -69,6 +69,21 @@ async def historian_node(state: AgentState) -> dict:
     }
 
 
+async def archivist_node(state: AgentState) -> dict:
+    """Agent C (Archivist): Persist the news item into long-term history.
+    This enables the system's memory to grow with every critical event.
+    """
+    item = state["news_item"]
+    logger.info("graph: archivist_node processing item '%s'", item.id)
+
+    from lydian.storage import vector_store
+    await vector_store.upsert_item(item)
+
+    return {
+        "agents_invoked": state.get("agents_invoked", []) + ["ArchivistAgent"],
+    }
+
+
 # ---- Routing logic -----------------------------------------------------------
 
 def route_after_filter(state: AgentState) -> str:
@@ -92,6 +107,7 @@ def _build_graph() -> object:
 
     builder.add_node("filter_node", filter_node)
     builder.add_node("historian_node", historian_node)
+    builder.add_node("archivist_node", archivist_node)
 
     builder.set_entry_point("filter_node")
 
@@ -105,8 +121,9 @@ def _build_graph() -> object:
         },
     )
 
-    # historian_node always goes to END.
-    builder.add_edge("historian_node", END)
+    # historian_node goes to archivist to save for the future.
+    builder.add_edge("historian_node", "archivist_node")
+    builder.add_edge("archivist_node", END)
 
     compiled = builder.compile()
     logger.info("graph: StateGraph compiled successfully")

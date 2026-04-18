@@ -51,6 +51,24 @@ SENTINEL_INFERENCE_MODE=local  # or 'cloud'
 
 ---
 
+## 🧠 Self-Learning Memory
+
+The Lydian Engine is not static. It features an **Archivist Agent** that implements a self-learning feedback loop:
+1.  **Detection**: News is classified as `Critical`.
+2.  **Audit**: The engine performs RAG against existing history.
+3.  **Persistence**: The event is automatically embedded and stored in **LanceDB**.
+4.  **Growth**: Today's volatile event becomes part of tomorrow's historical context, allowing the engine to "remember" market regimes as they happen.
+
+---
+
+## 🗺️ Roadmap
+- [x] **Twin-Mode Inference**: Local SLM vs Cloud API.
+- [x] **Archivist Node**: Dynamic vector store write-back.
+- [ ] **RSS Feed Ingester**: Real-time polling for Yahoo Finance/Reuters.
+- [ ] **Multi-Ticker Correlation**: Cross-referencing news impact across sectoral ETFs.
+
+---
+
 ## 📂 Directory Structure
 
 ```text

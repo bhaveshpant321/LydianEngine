@@ -152,3 +152,38 @@ async def search(query_text: str, k: int | None = None) -> list[HistoricalEvent]
         query_text,
     )
     return events
+
+
+async def upsert_item(item: NewsItem, category: str = "Live Feed") -> None:
+    """Persist a new news item into the historical vector store.
+    This enables 'Growing Memory' (self-learning), where today's news
+    becomes tomorrow's historical context for the Historian agent."""
+    if _table is None:
+        logger.warning("vector_store.upsert_item(): table not initialised — skipping")
+        return
+
+    try:
+        # Use the same pre-processing logic as seeding to ensure search compatibility
+        full_text = item.text_for_embedding
+        vector = await embed(full_text)
+
+        row = {
+            "event_id": item.id,
+            "headline": item.headline,
+            "date": item.timestamp.strftime("%Y-%m-%d"),
+            "impact": "Live classification: Audit pending.",
+            "category": category,
+            "full_text": full_text,
+            "vector": vector,
+        }
+
+        # LanceDB Table.add is synchronous in the python lib, 
+        # so we run it in a thread pool.
+        await asyncio.to_thread(_table.add, [row])
+        logger.info(
+            "vector_store: persisted item '%s' as historical context",
+            item.id,
+            extra={"headline": item.headline},
+        )
+    except Exception as exc:
+        logger.error("vector_store.upsert_item() failed: %s", exc)
