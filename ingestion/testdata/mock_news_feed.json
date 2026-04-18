@@ -1,0 +1,162 @@
+[
+  {
+    "id": "evt-001",
+    "headline": "Federal Reserve signals 50bps emergency rate cut amid market turmoil",
+    "body": "In an unprecedented inter-meeting action, the Federal Reserve voted 10-0 to cut the federal funds rate by 50 basis points after the S&P500 fell 4.2% in two consecutive sessions. The decision was driven by deteriorating credit conditions in the commercial paper market and a sharp inversion of the 2-10 year yield curve beyond 80bps. Fed Chair Powell stated this was a 'necessary pre-emptive measure' against contagion risk.",
+    "source": "Reuters",
+    "timestamp": "2024-03-15T14:30:00Z",
+    "tickers": ["SPY", "TLT", "GLD"]
+  },
+  {
+    "id": "evt-002",
+    "headline": "Silicon Valley Bank seized by FDIC in largest US bank failure since 2008",
+    "body": "California regulators shut down Silicon Valley Bank and appointed the FDIC as receiver, marking the largest US bank failure since Washington Mutual in 2008. SVB held approximately $209 billion in assets. The collapse followed a bank run triggered by the disclosure of a $1.8bn loss on bond sales and a failed attempt to raise $2.25bn in fresh capital. Contagion fears spiked with Signature Bank shares halting.",
+    "source": "Wall Street Journal",
+    "timestamp": "2023-03-10T18:00:00Z",
+    "tickers": ["SIVB", "SBNY", "KRE", "XLF"]
+  },
+  {
+    "id": "evt-003",
+    "headline": "CPI prints 9.1% — highest inflation reading in 40 years, dollar surges",
+    "body": "The US Bureau of Labor Statistics reported that the Consumer Price Index rose 9.1% year-over-year in June 2022, exceeding the consensus forecast of 8.8% and marking the fastest pace of inflation since November 1981. Core CPI ex-food and energy rose 5.9%. The dollar index (DXY) rallied to 108.5 while rate futures priced in a 100bps Fed hike for July.",
+    "source": "Bloomberg",
+    "timestamp": "2022-07-13T12:30:00Z",
+    "tickers": ["DXY", "TIP", "TIPS", "ZN"]
+  },
+  {
+    "id": "evt-004",
+    "headline": "Nvidia Q3 earnings beat by 19%; data center revenue hits $18.4bn record",
+    "body": "Nvidia reported Q3 FY2024 revenue of $18.12bn, beating analyst consensus of $16.18bn by 12%. Data center segment revenue reached $14.51bn, up 279% year-over-year, driven by H100 GPU demand from hyperscalers and AI startups. EPS of $4.02 beat estimates of $3.37. The company guided Q4 revenue to $20bn ±2%, significantly above the $17.86bn Street estimate.",
+    "source": "CNBC",
+    "timestamp": "2023-11-21T21:05:00Z",
+    "tickers": ["NVDA", "AMD", "INTC", "SMH"]
+  },
+  {
+    "id": "evt-005",
+    "headline": "China Evergrande misses offshore bond coupon — contagion risk elevates across EM",
+    "body": "China Evergrande Group failed to make a $83.5m coupon payment on its dollar bonds, entering a 30-day grace period. Analysts at Goldman Sachs and Morgan Stanley both upgraded contagion tail risk to 'elevated' citing Evergrande's $300bn liability ledger. Chinese HY dollar bond spreads widened 180bps intraday. Hang Seng fell 3.3% on the open.",
+    "source": "Financial Times",
+    "timestamp": "2021-09-23T04:00:00Z",
+    "tickers": ["FXI", "EEM", "HYG", "IEMB"]
+  },
+  {
+    "id": "evt-006",
+    "headline": "Apple reports record $124.3bn quarterly revenue; iPhone 15 cycle beats expectations",
+    "body": "Apple Inc posted fiscal Q1 2024 revenue of $119.6bn, slightly below the prior record but with Services revenue hitting a new all-time high of $23.1bn, up 11% YoY. Gross margin expanded to 45.9% from 42.3% a year ago. CEO Tim Cook flagged strong momentum in India and growth in the installed base to 2.2 billion active devices globally.",
+    "source": "Bloomberg",
+    "timestamp": "2024-02-01T21:30:00Z",
+    "tickers": ["AAPL", "QQQ", "XLK"]
+  },
+  {
+    "id": "evt-007",
+    "headline": "OPEC+ announces surprise 1 million barrel-per-day production cut",
+    "body": "Saudi Arabia announced a voluntary additional production cut of 1 million barrels per day effective July 2023, on top of existing OPEC+ agreed cuts. The decision came as a surprise, with oil prices jumping 4.1% on Brent crude to $84.70/bbl. The IEA warned of a supply deficit of 2.1m bpd through Q4 2023. Energy equities surged, with XLE gaining 2.8%.",
+    "source": "Reuters",
+    "timestamp": "2023-07-03T08:30:00Z",
+    "tickers": ["USO", "XLE", "CVX", "XOM"]
+  },
+  {
+    "id": "evt-008",
+    "headline": "Japanese yen hits weakest level since 1990 as BOJ holds ultra-loose policy",
+    "body": "The USD/JPY rate surpassed 158, the weakest level for the yen since April 1990, after the Bank of Japan maintained its yield curve control policy and kept rates at -0.1% despite persistent imported inflation. Japanese Finance Ministry officials issued verbal intervention warnings for the third time this year. 10-year JGB yield was capped at 1%.",
+    "source": "Nikkei",
+    "timestamp": "2024-04-10T03:00:00Z",
+    "tickers": ["FXY", "EWJ", "DXY"]
+  },
+  {
+    "id": "evt-009",
+    "headline": "SEC charges Binance and CEO CZ with operating unregistered exchange",
+    "body": "The US Securities and Exchange Commission filed 13 charges against Binance Holdings Ltd and its founder Changpeng 'CZ' Zhao, alleging operation of an unregistered national securities exchange, broker, and clearing agency. Bitcoin fell 4.8% to $25,350 on the news. Coinbase shares dropped 9% in sympathy as regulatory risk premiums repriced sector-wide.",
+    "source": "Reuters",
+    "timestamp": "2023-06-05T16:00:00Z",
+    "tickers": ["COIN", "MSTR", "BTC-USD"]
+  },
+  {
+    "id": "evt-010",
+    "headline": "Microsoft completes $68.7bn Activision acquisition after 21-month regulatory battle",
+    "body": "Microsoft Corporation completed its acquisition of Activision Blizzard for $68.7 billion in cash, the largest gaming deal in history, after receiving final clearance from the UK's Competition and Markets Authority. The combined entity holds franchises including Call of Duty, World of Warcraft, and Candy Crush, adding an estimated $8-10bn in incremental annual revenue to Xbox.",
+    "source": "Bloomberg",
+    "timestamp": "2023-10-13T14:00:00Z",
+    "tickers": ["MSFT", "ATVI", "EA", "TTWO"]
+  },
+  {
+    "id": "evt-011",
+    "headline": "US Treasury 10-year yield breaches 5% for first time since 2007",
+    "body": "The US 10-year Treasury yield crossed the psychologically significant 5% level for the first time since 2007, driven by strong jobs data and hawkish Fed commentary. The move triggered a broad equity selloff with the S&P 500 falling 1.9%. The 30-year mortgage rate hit 8.03%, the highest since 2000, raising concerns about housing market freeze.",
+    "source": "Wall Street Journal",
+    "timestamp": "2023-10-19T15:30:00Z",
+    "tickers": ["TBT", "TMV", "TLT", "SPY", "XHB"]
+  },
+  {
+    "id": "evt-012",
+    "headline": "Tesla misses Q4 delivery estimates; shares fall 8% pre-market",
+    "body": "Tesla reported Q4 2023 deliveries of 484,507 vehicles, below the analyst consensus of 495,000 and the company's own production of 494,989, indicating a growing inventory build. Annual deliveries of 1.81m represented a 38% YoY increase but fell short of the 2m target CEO Elon Musk had set earlier in the year. Gross margins compressed to 17.6% from 25.1% a year prior.",
+    "source": "CNBC",
+    "timestamp": "2024-01-02T07:00:00Z",
+    "tickers": ["TSLA", "LCID", "RIVN"]
+  },
+  {
+    "id": "evt-013",
+    "headline": "OpenAI secures $10bn Microsoft investment at $29bn valuation",
+    "body": "Microsoft announced a multi-year, multi-billion dollar investment in OpenAI, reported at $10bn and pricing the AI company at roughly $29bn. The deal extends an earlier $1bn investment and deepens the strategic partnership through Azure cloud integration for OpenAI APIs. Analysts estimated the deal implied 80× forward ARR multiples, reigniting AI valuation debates.",
+    "source": "Financial Times",
+    "timestamp": "2023-01-23T12:00:00Z",
+    "tickers": ["MSFT", "GOOGL", "AMZN"]
+  },
+  {
+    "id": "evt-014",
+    "headline": "Goldman Sachs Q2 net income falls 58% on consumer division writedowns",
+    "body": "Goldman Sachs reported Q2 2023 net income of $1.22bn, down 58% year-over-year, following a $485m impairment on its GreenSky consumer lending unit and losses in the broader consumer platform. CEO David Solomon announced a strategic pivot back to core investment banking and wealth management. FICC revenue fell 26% to $3.1bn.",
+    "source": "Reuters",
+    "timestamp": "2023-07-19T12:30:00Z",
+    "tickers": ["GS", "MS", "JPM", "BAC"]
+  },
+  {
+    "id": "evt-015",
+    "headline": "Moody's downgrades 10 US regional banks; watch negative on 6 more",
+    "body": "Moody's Investors Service downgraded the credit ratings of 10 US regional banks, including M&T Bank, Pinnacle Financial, and Prosperity Bancshares, citing commercial real estate exposure and unrealized losses on held-to-maturity bond portfolios. Six additional banks including Bank of New York Mellon were placed on review for downgrade. KRE ETF fell 2.4%.",
+    "source": "Bloomberg",
+    "timestamp": "2023-08-07T18:00:00Z",
+    "tickers": ["KRE", "MTB", "BAC", "WFC"]
+  },
+  {
+    "id": "evt-016",
+    "headline": "China retaliates on US chip restrictions with rare earth export controls",
+    "body": "China's Ministry of Commerce announced export controls on gallium and germanium, critical materials used in semiconductor manufacturing, chipsets, and solar cells. The move directly responds to US BIS restrictions on advanced semiconductor exports to China. Analysts flagged potential supply chain disruptions for TSMC, Samsung, and global defense contractors. Rare earth ETFs spiked 6%.",
+    "source": "Nikkei",
+    "timestamp": "2023-07-03T06:00:00Z",
+    "tickers": ["REMX", "MP", "TSM", "SOXX"]
+  },
+  {
+    "id": "evt-017",
+    "headline": "World Health Organization declares mpox a global health emergency",
+    "body": "The WHO declared mpox a public health emergency of international concern (PHEIC) for the second time in two years, citing the rapid spread of a new clade in Central and Eastern Africa with a case fatality rate of 3.6% in the DRC. Biotech names with mpox vaccine exposure surged on the news, with BVNKF gaining 21%.",
+    "source": "Associated Press",
+    "timestamp": "2024-08-14T14:00:00Z",
+    "tickers": ["BNTX", "MRNA", "NVAX"]
+  },
+  {
+    "id": "evt-018",
+    "headline": "Aramco IPO raises $25.6bn — world's largest ever public offering",
+    "body": "Saudi Aramco raised $25.6bn in its initial public offering on the Saudi Exchange (Tadawul) at a price of 32 riyals per share, valuing the company at $1.7 trillion and surpassing Alibaba's 2014 record. The IPO was 4.65× oversubscribed. International institutional demand was tepid compared to domestic retail participation, raising questions about long-term secondary market liquidity.",
+    "source": "Financial Times",
+    "timestamp": "2019-12-11T06:00:00Z",
+    "tickers": ["2222.SR", "XOM", "CVX"]
+  },
+  {
+    "id": "evt-019",
+    "headline": "New noise item: Minor revision to US housing starts data",
+    "body": "The US Census Bureau released a minor revision to July housing starts data, adjusting the figure from 1.452m to 1.447m annualized units. The revision was within the margin of error and had negligible market impact. Homebuilder ETF XHB was unchanged on the news.",
+    "source": "Census Bureau",
+    "timestamp": "2024-08-23T14:00:00Z",
+    "tickers": ["XHB"]
+  },
+  {
+    "id": "evt-020",
+    "headline": "Routine FOMC minutes show broad consensus on current rate path",
+    "body": "Minutes from the most recent Federal Open Market Committee meeting showed broad consensus among members that current policy rates are 'sufficiently restrictive' and that the committee expects to maintain rates at current levels for at least the next two meetings absent significant changes in the inflation or employment outlook. No new forward guidance was offered.",
+    "source": "Federal Reserve",
+    "timestamp": "2024-08-21T18:00:00Z",
+    "tickers": ["SPY", "TLT"]
+  }
+]

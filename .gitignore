@@ -1,0 +1,48 @@
+# ── Secrets — NEVER commit these ─────────────────────────────────────────────
+.env
+*.env
+.env.local
+.env.production
+
+# ── Go ────────────────────────────────────────────────────────────────────────
+ingestion/bin/
+ingestion/*.exe
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# ── Model weights (large binary files) ───────────────────────────────────────
+**/data/models/
+sentinel/lydian/data/models/
+
+# ── LanceDB runtime files ─────────────────────────────────────────────────────
+**/data/lancedb/
+sentinel/lydian/data/lancedb/
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Educational ───────────────────────────────────────────────────────────────
+INSTRUCTION.md
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+sentinel/sentinel.log
+ingestion/ingest.log

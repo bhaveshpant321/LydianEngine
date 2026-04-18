@@ -1,0 +1,35 @@
+# Sentinel Python Service — Dependencies
+#
+# Pinned to minor versions for reproducibility; patch updates allowed.
+# Tested on Python 3.11.
+
+# ── API framework ─────────────────────────────────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+pydantic==2.7.1
+pydantic-settings==2.2.1
+
+# ── Agent framework ───────────────────────────────────────────────────────────
+langgraph==0.1.5
+langchain-core==0.2.0
+
+# ── LLM / Embedding ───────────────────────────────────────────────────────────
+transformers==4.41.0
+sentence-transformers==3.0.0
+torch==2.3.0           # CPU build; swap for torch+cu121 for CUDA support
+accelerate==0.30.0     # required for device_map="auto" in from_pretrained
+tokenizers==0.19.1
+
+# ── Vector store ──────────────────────────────────────────────────────────────
+lancedb==0.8.0
+pyarrow==15.0.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+numpy==1.26.4
+httpx==0.27.0          # used in tests; also available as optional FastAPI dep
+python-multipart==0.0.9
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest==8.2.0
+pytest-asyncio==0.23.6
+httpx==0.27.0

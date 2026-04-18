@@ -1,0 +1,98 @@
+# docker-compose.yml — Lydian Engine Full Stack
+#
+# Services:
+#   sentinel   — Python FastAPI service (agents + vector store)
+#   ingestion  — Go WebSocket ingestion service
+#
+# Volumes:
+#   lancedb-data  — Persistent LanceDB files (survives container restarts)
+#   model-cache   — HuggingFace model weights (avoids re-downloading)
+#
+# Usage:
+#   docker compose up --build          # build and start everything
+#   docker compose up sentinel         # run only the Python service
+#   docker compose logs -f ingestion   # tail Go service logs
+#   FEED_MODE=websocket WS_URL=ws://your-feed.com docker compose up  # live feed
+
+version: "3.9"
+
+services:
+
+  # ── Python Sentinel API ─────────────────────────────────────────────────────
+  sentinel:
+    build:
+      context: ./sentinel
+      dockerfile: Dockerfile
+    container_name: sentinel-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env          # loads HF_TOKEN and HUGGING_FACE_HUB_TOKEN from .env (gitignored)
+    environment:
+      # Storage
+      SENTINEL_LANCEDB_PATH: /data/lancedb
+      SENTINEL_LANCEDB_TABLE_NAME: market_history
+      SENTINEL_MARKET_HISTORY_CSV: /app/data/market_history.csv
+      # Embedding model
+      SENTINEL_EMBEDDING_MODEL: BAAI/bge-small-en-v1.5
+      SENTINEL_EMBEDDING_DIM: 384
+      SENTINEL_RAG_TOP_K: 3
+      # LLM filter
+      SENTINEL_FILTER_MODEL_ID: meta-llama/Llama-3.2-1B-Instruct
+      SENTINEL_FILTER_MAX_NEW_TOKENS: 128
+      SENTINEL_FILTER_TIMEOUT_MS: 150
+      # API
+      SENTINEL_API_HOST: 0.0.0.0
+      SENTINEL_API_PORT: 8000
+      SENTINEL_REQUEST_TIMEOUT_MS: 200
+      # HuggingFace model cache (persisted via volume)
+      SENTINEL_HF_CACHE_DIR: /data/models
+      HF_HOME: /data/models
+      # Optional: set to your HF token for gated models (Llama-3)
+      # HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+    volumes:
+      - lancedb-data:/data/lancedb
+      - model-cache:/data/models
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s   # allow extra time for model download on first start
+    networks:
+      - sentinel-net
+
+  # ── Go Ingestion Service ────────────────────────────────────────────────────
+  ingestion:
+    build:
+      context: ./ingestion
+      dockerfile: Dockerfile
+    container_name: sentinel-ingestion
+    restart: unless-stopped
+    depends_on:
+      sentinel:
+        condition: service_healthy
+    environment:
+      FEED_MODE: mock                                    # "mock" | "websocket"
+      MOCK_FILE: testdata/mock_news_feed.json
+      MOCK_INTERVAL: 500ms                               # items per 500ms
+      WS_URL: ws://host.docker.internal:8765/feed        # override for live mode
+      TARGET_URL: http://sentinel:8000/ingest            # points to sentinel container
+      BUFFER_CAPACITY: 256
+      LOG_LEVEL: info
+    networks:
+      - sentinel-net
+    # No ports exposed — internal service only
+
+# ── Volumes ───────────────────────────────────────────────────────────────────
+volumes:
+  lancedb-data:
+    driver: local
+  model-cache:
+    driver: local
+
+# ── Networks ──────────────────────────────────────────────────────────────────
+networks:
+  sentinel-net:
+    driver: bridge
