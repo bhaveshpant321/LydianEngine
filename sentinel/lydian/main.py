@@ -246,6 +246,8 @@ def create_app() -> FastAPI:
             severity=state.get("severity", "Noise"),
             filter_reasoning=state.get("filter_reasoning", ""),
             historical_context=state.get("historical_context", []),
+            max_similarity=round(state.get("max_similarity", 0.0), 4),
+            is_black_swan=state.get("is_black_swan", False),
             processing_time_ms=round(elapsed_ms, 2),
             agents_invoked=state.get("agents_invoked", []),
         )

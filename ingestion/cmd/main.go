@@ -5,10 +5,12 @@
 //
 // Environment variables (all optional with sane defaults):
 //
-//	FEED_MODE       = "mock" | "websocket" (default: "mock")
+//	FEED_MODE       = "mock" | "websocket" | "rss" (default: "mock")
 //	MOCK_FILE       = path to JSON news feed file (default: "testdata/mock_news_feed.json")
 //	MOCK_INTERVAL   = inter-message delay, e.g. "500ms" (default: "500ms")
 //	WS_URL          = WebSocket URL for live mode (default: "ws://localhost:8765/feed")
+//	RSS_URLS        = Comma-separated list of RSS feeds (default: "")
+//	RSS_INTERVAL    = Polling interval, e.g. "1m" (default: "5m")
 //	TARGET_URL      = FastAPI ingest endpoint (default: "http://sentinel:8000/ingest")
 //	BUFFER_CAPACITY = RingBuffer size (default: "256")
 //	LOG_LEVEL       = "debug" | "info" | "warn" | "error" (default: "info")
@@ -20,6 +22,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -38,6 +41,8 @@ func main() {
 	mockFile := getenv("MOCK_FILE", "testdata/mock_news_feed.json")
 	mockIntervalStr := getenv("MOCK_INTERVAL", "500ms")
 	wsURL := getenv("WS_URL", "ws://localhost:8765/feed")
+	rssURLsRaw := getenv("RSS_URLS", "")
+	rssIntervalStr := getenv("RSS_INTERVAL", "5m")
 	targetURL := getenv("TARGET_URL", "http://sentinel:8000/ingest")
 	bufCapStr := getenv("BUFFER_CAPACITY", "256")
 
@@ -65,6 +70,17 @@ func main() {
 		client = feed.NewMockClient(mockFile, mockInterval, logger)
 	case "websocket":
 		client = feed.NewWSClient(wsURL, logger)
+	case "rss":
+		rssInterval, err := time.ParseDuration(rssIntervalStr)
+		if err != nil {
+			logger.Error("invalid RSS_INTERVAL", slog.String("value", rssIntervalStr))
+			os.Exit(1)
+		}
+		urls := strings.Split(rssURLsRaw, ",")
+		for i := range urls {
+			urls[i] = strings.TrimSpace(urls[i])
+		}
+		client = feed.NewRSSClient(urls, rssInterval, logger)
 	default:
 		logger.Error("unknown FEED_MODE", slog.String("mode", feedMode))
 		os.Exit(1)

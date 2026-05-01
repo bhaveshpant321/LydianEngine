@@ -30,6 +30,10 @@ class NewsItem(BaseModel):
         list[str],
         Field(default_factory=list, description="Equity symbols mentioned"),
     ]
+    potential_negation: bool = Field(
+        default=False,
+        description="True if inversion keywords like 'no' or 'not' were detected",
+    )
 
     @field_validator("id", "headline", "body", "source", mode="before")
     @classmethod
@@ -123,6 +127,14 @@ class AlertResponse(BaseModel):
     historical_context: list[HistoricalEvent] = Field(
         default_factory=list,
         description="Top-3 similar historical events from Agent B (empty if Noise)",
+    )
+    max_similarity: float = Field(
+        default=0.0,
+        description="Highest cosine similarity score found during historical search",
+    )
+    is_black_swan: bool = Field(
+        default=False,
+        description="True if the event is Critical but has low historical similarity",
     )
 
     # ── Observability ────────────────────────────────────────────────────────

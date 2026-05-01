@@ -31,6 +31,8 @@ type NewsItem struct {
 	Timestamp time.Time `json:"timestamp"`
 	// Tickers contains zero or more equity symbols mentioned in the article.
 	Tickers []string `json:"tickers,omitempty"`
+	// PotentialNegation is flagged if keywords like 'no' or 'not' are found.
+	PotentialNegation bool `json:"potential_negation"`
 	// Severity is populated downstream by Agent A; left empty at ingestion.
 	Severity Severity `json:"severity,omitempty"`
 }
@@ -61,4 +63,16 @@ func (n *NewsItem) Validate() error {
 		return errors.New(strings.Join(errs, "; "))
 	}
 	return nil
+}
+
+// DetectNegation scans the headline and body for inversion keywords.
+func (n *NewsItem) DetectNegation() {
+	keywords := []string{"not", "no ", "never", "fail", "cancel", "denies", "refutes", "halt", "stop", "none"}
+	text := strings.ToLower(n.Headline + " " + n.Body)
+	for _, kw := range keywords {
+		if strings.Contains(text, kw) {
+			n.PotentialNegation = true
+			return
+		}
+	}
 }

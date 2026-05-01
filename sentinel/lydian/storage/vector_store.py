@@ -6,8 +6,8 @@ from typing import Any
 
 import lancedb
 import numpy as np
-from sentence_transformers import SentenceTransformer
 
+from huggingface_hub import InferenceClient
 from lydian.core.config import get_settings
 from lydian.schemas.models import HistoricalEvent
 
@@ -25,63 +25,69 @@ _table: Any | None = None  # lancedb.Table
 
 
 async def init_vector_store() -> None:
-    """Load the embedding model and open the LanceDB table.
-    Must be called once during application startup before any RAG queries.
-    Uses ``asyncio.to_thread`` to avoid blocking the event loop during the
-    (slow) model weight loading."""
-    global _embedder, _table  # noqa: PLW0603 — intentional singleton init
-
+    """Load the embedding model and open the LanceDB table."""
+    global _embedder, _table
     cfg = get_settings()
 
-    logger.info(
-        "vector_store: loading embedding model",
-        extra={"model": cfg.embedding_model},
-    )
-    _embedder = await asyncio.to_thread(
-        SentenceTransformer,
-        cfg.embedding_model,
-        cache_folder=cfg.hf_cache_dir,
-    )
+    if cfg.inference_mode == "local":
+        logger.info("vector_store: loading local embedding model: %s", cfg.embedding_model)
+        try:
+            from sentence_transformers import SentenceTransformer
+            _embedder = await asyncio.to_thread(
+                SentenceTransformer,
+                cfg.embedding_model,
+                cache_folder=cfg.hf_cache_dir,
+            )
+        except Exception as exc:
+            logger.error("vector_store: failed to load local model: %s. Falling back to cloud-only.", exc)
+            _embedder = None
+    else:
+        logger.info("vector_store: cloud mode active — using HF Inference API for embeddings")
+        _embedder = None # Handled by InferenceClient
 
     db = await asyncio.to_thread(lancedb.connect, cfg.lancedb_path)
     table_names = await asyncio.to_thread(db.table_names)
 
     if cfg.lancedb_table_name not in table_names:
-        logger.warning(
-            "vector_store: table '%s' not found — run storage/seed.py first",
-            cfg.lancedb_table_name,
-        )
+        logger.warning("vector_store: table '%s' not found", cfg.lancedb_table_name)
         _table = None
         return
 
     _table = await asyncio.to_thread(db.open_table, cfg.lancedb_table_name)
     row_count = await asyncio.to_thread(lambda: _table.count_rows())
-    logger.info(
-        "vector_store: ready",
-        extra={"table": cfg.lancedb_table_name, "rows": row_count},
-    )
+    logger.info("vector_store: ready (rows=%d)", row_count)
 
 
 async def embed(text: str) -> list[float]:
-    """Embed *text* using the loaded SentenceTransformer model.
+    """Embed *text* using either local or cloud models."""
+    cfg = get_settings()
 
-    Runs in a thread pool to avoid blocking the async event loop.
-    Raises ``RuntimeError`` if called before ``init_vector_store``.
-
-    Target latency: < 50 ms on CPU for BGE-Small-v1.5 (384-dim).
-    """
-    if _embedder is None:
-        raise RuntimeError(
-            "vector_store.embed() called before init_vector_store(). "
-            "Ensure the FastAPI lifespan has completed startup."
+    if cfg.inference_mode == "local" and _embedder:
+        vector: np.ndarray = await asyncio.to_thread(
+            _embedder.encode,
+            text,
+            normalize_embeddings=True,
+            show_progress_bar=False,
         )
-    vector: np.ndarray = await asyncio.to_thread(
-        _embedder.encode,
-        text,
-        normalize_embeddings=True,  # cosine similarity via dot product
-        show_progress_bar=False,
-    )
-    return vector.tolist()
+        return vector.tolist()
+    
+    # Cloud Embedding Fallback (or primary if mode is cloud)
+    try:
+        client = InferenceClient(token=cfg.hf_token)
+        # Use feature_extraction for embedding models
+        response = await asyncio.to_thread(
+            client.feature_extraction,
+            text,
+            model=cfg.embedding_model
+        )
+        # BGE returns a 1D or 2D list depending on input
+        if isinstance(response, list) and len(response) > 0:
+            if isinstance(response[0], list): return response[0]
+            return response
+        return [0.0] * cfg.embedding_dim # Fail-safe
+    except Exception as exc:
+        logger.error("vector_store: cloud embed failed: %s", exc)
+        return [0.0] * cfg.embedding_dim
 
 
 async def search(query_text: str, k: int | None = None) -> list[HistoricalEvent]:

@@ -19,11 +19,10 @@ import time
 from functools import lru_cache
 from typing import Literal
 
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from huggingface_hub import InferenceClient
 
 from lydian.core.config import get_settings
-from lydian.schemas.models import NewsItem
+from lydian.schemas.models import NewsItem, HistoricalEvent
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +55,8 @@ _USER_TEMPLATE = (
     "HEADLINE: {headline}\n"
     "BODY EXCERPT: {body_excerpt}\n"
     "TICKERS: {tickers}\n\n"
+    "HISTORICAL CONTEXT (Similar Critical Events):\n"
+    "{context}\n\n"
     "Classify this news item and end with your VERDICT."
 )
 
@@ -67,6 +68,7 @@ def _load_pipeline() -> object:
     cfg = get_settings()
     logger.info("filter_agent: loading model '%s' ...", cfg.filter_model_id)
 
+    from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
     tokenizer = AutoTokenizer.from_pretrained(
         cfg.filter_model_id, cache_dir=cfg.hf_cache_dir
     )
@@ -103,15 +105,25 @@ async def prewarm() -> None:
         logger.info("filter_agent: cloud mode active — skipping local pre-warm")
 
 
-def _build_prompt(item: NewsItem) -> str:
-    """Construct the instruct-formatted prompt for Llama-3."""
+def _build_prompt(item: NewsItem, context_events: list[HistoricalEvent] | None = None) -> str:
+    """Construct the instruct-formatted prompt for Llama-3 with optional few-shot context."""
     tickers = ", ".join(item.tickers) if item.tickers else "N/A"
     body_excerpt = item.body[:512].replace("\n", " ")
+    
+    if context_events:
+        context_str = "\n".join(
+            f"- [{e.date}] {e.headline} (Impact: {e.impact})"
+            for e in context_events
+        )
+    else:
+        context_str = "No specific historical parallels found in database."
+
     user_msg = _USER_TEMPLATE.format(
         source=item.source,
         headline=item.headline,
         body_excerpt=body_excerpt,
         tickers=tickers,
+        context=context_str,
     )
     # Llama-3 chat format (works for most instruction-tuned variants).
     return (
@@ -148,7 +160,7 @@ def _parse_verdict(raw_output: str) -> tuple[Verdict, str]:
     return "Noise", f"Parser fallback. Raw output: {raw_output[:200]}"
 
 
-async def _call_cloud_api(item: NewsItem) -> tuple[Verdict, str]:
+async def _call_cloud_api(item: NewsItem, context_events: list[HistoricalEvent] | None = None) -> tuple[Verdict, str]:
     """Call the HuggingFace Serverless Inference API with a Mock fallback."""
     cfg = get_settings()
 
@@ -165,13 +177,22 @@ async def _call_cloud_api(item: NewsItem) -> tuple[Verdict, str]:
         token=cfg.hf_token,
     )
 
+    if context_events:
+        context_str = "\n".join(
+            f"- [{e.date}] {e.headline} (Impact: {e.impact})"
+            for e in context_events
+        )
+    else:
+        context_str = "No specific historical parallels found in database."
+
     messages = [
         {"role": "system", "content": _SYSTEM_PROMPT},
         {"role": "user", "content": _USER_TEMPLATE.format(
             source=item.source,
             headline=item.headline,
             body_excerpt=item.body[:512],
-            tickers=", ".join(item.tickers) if item.tickers else "N/A"
+            tickers=", ".join(item.tickers) if item.tickers else "N/A",
+            context=context_str
         )}
     ]
 
@@ -197,10 +218,10 @@ async def _call_cloud_api(item: NewsItem) -> tuple[Verdict, str]:
         return "Noise", f"Cloud API error: {exc}"
 
 
-def _run_inference(item: NewsItem) -> tuple[Verdict, str]:
+def _run_inference(item: NewsItem, context_events: list[HistoricalEvent] | None = None) -> tuple[Verdict, str]:
     """Synchronous inference entry point — called via asyncio.to_thread (local mode)."""
     pipe = _load_pipeline()
-    prompt = _build_prompt(item)
+    prompt = _build_prompt(item, context_events)
 
     t0 = time.perf_counter()
     results = pipe(prompt)  # type: ignore[operator]
@@ -215,7 +236,7 @@ def _run_inference(item: NewsItem) -> tuple[Verdict, str]:
     return _parse_verdict(raw)
 
 
-async def classify(item: NewsItem) -> tuple[Verdict, str]:
+async def classify(item: NewsItem, context_events: list[HistoricalEvent] | None = None) -> tuple[Verdict, str]:
     """Async entry point for Agent A.
 
     Toggles between 'local' and 'cloud' inference. On 'local', enforces
@@ -225,7 +246,7 @@ async def classify(item: NewsItem) -> tuple[Verdict, str]:
 
     if cfg.inference_mode == "cloud":
         try:
-            return await _call_cloud_api(item)
+            return await _call_cloud_api(item, context_events)
         except Exception as exc:
             logger.error("filter_agent: cloud API error: %s", exc)
             return "Noise", f"Cloud API error: {exc}"
@@ -234,7 +255,7 @@ async def classify(item: NewsItem) -> tuple[Verdict, str]:
     timeout_s = cfg.filter_timeout_ms / 1000.0
     try:
         verdict, reasoning = await asyncio.wait_for(
-            asyncio.to_thread(_run_inference, item),
+            asyncio.to_thread(_run_inference, item, context_events),
             timeout=timeout_s,
         )
     except asyncio.TimeoutError:

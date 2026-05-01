@@ -61,6 +61,7 @@ func (m *MockClient) Connect(ctx context.Context) (<-chan models.NewsItem, error
 		defer close(out)
 
 		for i, item := range items {
+			item.DetectNegation()
 			// Validate before sending so downstream never sees malformed data.
 			if err := item.Validate(); err != nil {
 				m.logger.Warn("mock feed: skipping invalid item",

@@ -108,6 +108,20 @@ class Settings(BaseSettings):
         return v
 
 
+    # ── Modular Intelligence Thresholds ──────────────────────────────────────
+    short_circuit_noise_threshold: float = Field(
+        default=0.15,
+        description="Similarity score below which an event is likely noise (if no keywords match).",
+    )
+    short_circuit_critical_threshold: float = Field(
+        default=0.92,
+        description="Similarity score above which an event is auto-classified as Critical.",
+    )
+    black_swan_threshold: float = Field(
+        default=0.50,
+        description="Similarity score below which a Critical event is flagged as a Black Swan.",
+    )
+
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     """Return the singleton Settings instance.  Using lru_cache ensures
