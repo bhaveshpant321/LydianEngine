@@ -33,8 +33,8 @@ graph TD
     end
     
     subgraph "Intelligence Layers"
-    I[Llama-3.2-1B / Cloud API]
-    J[Negation Guardrail (Go)]
+    I["Llama-3.2-1B / Cloud API"]
+    J["Negation Guardrail (Go)"]
     end
     
     A -.-> J
